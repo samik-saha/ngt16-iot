@@ -1,7 +1,7 @@
 # This script handle all user interaction and display
 meeting_room_id=100
 
-from RPLCD import CharLCD, BacklightMode
+from RPLCD import CharLCD
 import RPi.GPIO as GPIO
 
 #Setup LCD pins
