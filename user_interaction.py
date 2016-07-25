@@ -1,11 +1,12 @@
-# This script handle all user interaction and display
-meeting_room_id = 100
+## This script handle all user interaction and display
 
 from RPLCD import CharLCD
 import RPi.GPIO as GPIO
 import time
-import urllib, urllib2
+import urllib, httplib
+import json
 
+# Set GPIO mode
 GPIO.setmode(GPIO.BOARD)
 
 # Setup LCD pins
@@ -27,7 +28,7 @@ for j in range(4):
 for i in range(4):
     GPIO.setup(ROW[i], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-
+# Function to read nKeys no. of keys
 def read_keys(nKeys):
     n = 0
     input_value = ""
@@ -55,12 +56,9 @@ def read_keys(nKeys):
     return input_value
 
 
-url = 'http://runnerp11.codenvycorp.com:62744/meeting_room'
-data = ({
-    'meetingroom_id': '100'
-})
 
 
+# Activates a meeting room on valid user key
 def activate_room(passcode):
     lcd.write_string('Enter passcode: ')
     input_passcode = read_keys(4)
@@ -73,6 +71,8 @@ def activate_room(passcode):
         lcd.write_string('Meeting in Progress')
         lcd.cursor_pos=(2,0)
         lcd.write_string('For 10 min break press B')
+        # call webservice
+
     else:
         lcd.write_string ('Invalid passcode. Please try again')
         return False
@@ -80,4 +80,31 @@ def activate_room(passcode):
     return True
 
 
-activate_room('1234')
+# Global variables
+meeting_room_id = 100
+
+server = 'runnerp11.codenvycorp.com:62744'
+
+meeting_data = urllib.urlencode({
+    'meetingroom_id':meeting_room_id,
+    'action':'meeting_details'
+})
+
+h = httplib.HTTPConnection(server)
+headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
+
+# TODO:  Put the below block in loop
+
+# Request current meeting details from server
+h.request('POST', '/meeting_room', meeting_data, headers)
+r = h.getresponse()
+s = r.read()
+print s # Response format: {"booked": "yes", "meeting_id": "1001234" }
+meeting_details = json.loads(s)
+
+if meeting_details['booked'] == 'yes':
+    # Set passcode as last 4 digits of meeting id
+    passcode = meeting_details['meeting_id'][-4:]
+    activate_room(passcode)
+
+
