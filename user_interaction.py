@@ -60,6 +60,12 @@ def read_keys(nKeys):
 
 # Activates a meeting room on valid user key
 def activate_room(passcode):
+    print ('---------------------')                                                                                      
+    print ('|Enter passcode:     |')                                                                                     
+    print ('|                    |')                                                                                     
+    print ('|                    |')                                                                                     
+    print ('|                    |')                                                                                     
+    print ('---------------------')
     lcd.write_string('Enter passcode: ')
     input_passcode = read_keys(4)
     time.sleep(1)
@@ -68,12 +74,24 @@ def activate_room(passcode):
     time.sleep(1)
     lcd.clear()
     if passcode == input_passcode:
+        print ('---------------------')                                                                                  
+        print ('|Meeting in Progress |')                                                                                 
+        print ('|                    |')                                                                                 
+        print ('|For 10 min break    |')                                                                                 
+        print ('|press B             |')                                                                                 
+        print ('---------------------')
         lcd.write_string('Meeting in Progress')
         lcd.cursor_pos=(2,0)
         lcd.write_string('For 10 min break press B')
         # call webservice
 
     else:
+        print ('---------------------')                                                                                  
+        print ('|Invalid passcode!   |')                                                                                 
+        print ('|Please try again.   |')                                                                                 
+        print ('|For 10 min break    |')                                                                                 
+        print ('|press B             |')                                                                                 
+        print ('---------------------')
         lcd.write_string ('Invalid passcode. Please try again')
         return False
 
