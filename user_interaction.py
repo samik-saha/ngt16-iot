@@ -13,6 +13,8 @@ meeting_room_id = 100
 server = 'runnerp13.codenvycorp.com:50456'
 motion_detected_time = time.time()
 meeting_room_state = 'free'
+default_cancel_dur = 10 #minutes
+default_cancel_pause_dur = 15 #minutes
 # ======================================================
 
 
@@ -89,12 +91,12 @@ def read_motion_sensor():
             # TODO Post data to server\
         else:
             no_motion_duration = time.time()- motion_detected_time
-            if (no_motion_duration > 1200 and meeting_room_state == 'break')\
-                or (no_motion_duration > 600 and meeting_room_state == 'active'):
+            if (no_motion_duration > 60 * default_cancel_pause_dur and meeting_room_state == 'break')\
+                or (no_motion_duration > 60 * default_cancel_dur and meeting_room_state == 'active'):
                 # TODO Send end req
                 print ('Meeting will be ended by system')
 
-            elif no_motion_duration > 600 and meeting_room_state == 'booked':
+            elif no_motion_duration > 60 * default_cancel_dur and meeting_room_state == 'booked':
                 # TODO Send cancel req
                 print ('The meeting will be cancelled')
 
@@ -122,12 +124,14 @@ def activate_room(passcode):
             print ('---------------------')                                                                                  
             print ('|Meeting in Progress |')                                                                                 
             print ('|To end press "C"    |')                                                                                 
-            print ('|For 10 min break    |')                                                                                 
+            print ('|For 15 min break    |')                                                                                 
             print ('|press "B"           |')
             print ('---------------------')
             lcd.write_string('Meeting in Progress')
+            lcd.cursor_pos=(1,0)
+            lcd.write_string('To end press "C"')
             lcd.cursor_pos=(2,0)
-            lcd.write_string('For 10 min break press B')
+            lcd.write_string('For 15 min break press B')
             handle_user_options()
             break
     
